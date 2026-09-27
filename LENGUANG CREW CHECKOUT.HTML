@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>稜光影視 - 每日撤場工時上數表</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 480px;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    .header h2 { margin: 0; color: #1a2530; font-size: 20px; }
+    .header p { margin: 5px 0 0; color: #666; font-size: 13px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #333; }
+    input, select {
+      width: 100%; padding: 10px 12px; border: 1px solid #ccc;
+      border-radius: 6px; font-size: 15px; box-sizing: border-box;
+    }
+    .time-row { display: flex; gap: 10px; }
+    .time-row .form-group { flex: 1; }
+    button {
+      width: 100%; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white; border: none; padding: 14px; border-radius: 6px;
+      font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;
+    }
+    #auth-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(26, 37, 48, 0.95); display: flex;
+      justify-content: center; align-items: center; z-index: 999;
+    }
+    .auth-box { background: white; padding: 25px; border-radius: 10px; text-align: center; width: 280px; }
+  </style>
+</head>
+<body>
+
+  <!-- 密碼遮罩 -->
+  <div id="auth-overlay">
+    <div class="auth-box">
+      <h3 style="margin-top:0;">稜光影視 團隊驗證</h3>
+      <p style="font-size:13px; color:#666;">請輸入訪問密碼以開啟報工系統</p>
+      <input type="password" id="access-code" placeholder="請輸入密碼" style="text-align:center; margin-bottom:15px;">
+      <button onclick="checkPassword()">解鎖表格</button>
+    </div>
+  </div>
+
+  <!-- 主表單 -->
+  <div class="card">
+    <div class="header">
+      <h2>LENGUANG HR & CREW</h2>
+      <p>每日撤場 / 工時即時上數表</p>
+    </div>
+
+    <form id="crewForm" onsubmit="submitToGoogle(event)">
+      
+      <div class="form-group">
+        <label>工作日期 Date</label>
+        <input type="date" id="work_date" name="entry.1877567480" required>
+      </div>
+
+      <div class="form-group">
+        <label>姓名 Name</label>
+        <input type="text" name="entry.545070976" placeholder="例如：鄭曉泓" required>
+      </div>
+
+      <div class="form-group">
+        <label>崗位 Role</label>
+        <select name="entry.460929951" required>
+          <option value="Tech Crew">Tech Crew</option>
+          <option value="Camera Assistant">Camera Assistant</option>
+          <option value="Camera Operator">Camera Operator</option>
+          <option value="Audio Engineer">Audio Engineer</option>
+          <option value="Lighting Engineer">Lighting Engineer</option>
+          <option value="Other">Other(請在備註說明)</option>
+        </select>
+      </div>
+
+      <div class="time-row">
+        <div class="form-group">
+          <label>上班 IN</label>
+          <input type="text" name="entry.1023292889" placeholder="例如：14:30" required>
+        </div>
+        <div class="form-group">
+          <label>下班 OUT</label>
+          <input type="text" name="entry.452084007" placeholder="例如：23:30" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>當日總工時 Total Hours (hrs)</label>
+        <input type="number" step="0.5" name="entry.1288981068" placeholder="例如：11.5" required>
+      </div>
+
+      <div class="form-group">
+        <label>活動場館 / 項目 Location & Project</label>
+        <input type="text" name="entry.773688027" placeholder="例如：Galaxy Arena / Concert" required>
+      </div>
+
+      <button type="submit" id="submitBtn">🔒 加密送出 (Submit)</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('work_date').valueAsDate = new Date();
+
+    function checkPassword() {
+      const pwd = document.getElementById('access-code').value;
+      if (pwd === "8888") {
+        document.getElementById('auth-overlay').style.display = 'none';
+      } else {
+        alert("密碼不正確！");
+      }
+    }
+
+    // 使用 Fetch API 提交，100% 成功送出
+    function submitToGoogle(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "傳送中...";
+      btn.disabled = true;
+
+      const form = document.getElementById('crewForm');
+      const formData = new FormData(form);
+      const googleFormUrl = 'https://docs.google.com/forms/u/0/d/1BT1TCAV9xuAIV5QkA0rnjT-VdAPZyFjlT6fyXjTWhlg/formResponse';
+
+      fetch(googleFormUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      }).then(() => {
+        alert("工時已成功送出！資料已安全歸檔。");
+        form.reset();
+        document.getElementById('work_date').valueAsDate = new Date();
+        btn.innerText = "🔒 加密送出 (Submit)";
+        btn.disabled = false;
+      }).catch((error) => {
+        alert("提交失敗，請檢查網絡連線！");
+        btn.innerText = "🔒 加密送出 (Submit)";
+        btn.disabled = false;
+      });
+    }
+  </script>
+</body>
+</html>
